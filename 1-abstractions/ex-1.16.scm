@@ -1,0 +1,16 @@
+(define (expt b n)
+  (define (expt-iter acc current n)
+    (cond ((= n 0) acc)
+          ((even? n) (expt-iter acc (* current current) (/ n 2)))
+          (else (expt-iter (* acc current) current (- n 1)))))
+  (define (even? n)
+    (= (remainder n 2) 0))
+  (expt-iter 1 b n)
+)
+
+
+(expt 2 3)
+(expt 2 4)
+(expt 2 5)
+(expt 2 6)
+(expt 3 9)
