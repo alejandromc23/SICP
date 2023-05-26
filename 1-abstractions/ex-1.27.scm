@@ -21,8 +21,6 @@
     (carmichael-number?-iter n (- n 1))
 )
 
-
-(display (carmichael-number? 20))
 (display (carmichael-number? 561))
 (display (carmichael-number? 1105))
 (display (carmichael-number? 1729))
