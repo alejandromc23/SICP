@@ -19,11 +19,7 @@
 (define dx 0.00001)
 
 (define (n-fold-smoothed f n)
-    (repeated smoothed n))
+    ((repeated smoothed n) f)
+)
 
-((n-fold-smoothed square 2) 2)
-((repeated square 2) 5)
-((repeated square 1) 2)
-((smoothed square) 2)
-(n-fold-smoothed square 2)
-(((repeated smoothed 2) square)2)
+((n-fold-smoothed square 3) 2)
