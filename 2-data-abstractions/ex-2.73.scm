@@ -34,3 +34,20 @@
 
   (put 'deriv '* product)
   'done)
+
+(define (install-exp-deriv-operations)
+  (define (make-exp base exp)
+    (cond ((=number? exp 0) 1)
+          ((=number? exp 1) base)
+          ((and (number? base) (number? exp)) (expt base exp))
+          (else (list '** base exp))))
+
+  (define (exp operands var)
+    (make-product
+     (make-product (cadr operands)
+                   (make-exp (car operands)
+                             (make-sum (cadr operands) -1)))
+     (deriv (car operands) var)))
+
+  (put 'deriv '** exp)
+  'done)
