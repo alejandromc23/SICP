@@ -1,0 +1,62 @@
+(define (project x) (apply-generic 'project x))
+
+(define (install-scheme-number-package)
+  (define (tag x) (attach-tag 'scheme-number x))
+  (define (project x) x)
+  (put 'project '(scheme-number) (lambda (x) (tag (project x))))
+  'done)
+
+(define (install-rational-package)
+  (define (tag x) (attach-tag 'rational x))
+  (define (project x) (round (/ (numer x) (denom x))))
+  (put 'project '(rational) (lambda (x) (tag (project x))))
+  'done)
+
+(define (install-real-package)
+  (define (tag x) (attach-tag 'real x))
+  (define (project x) (round x))
+  (put 'project '(real) (lambda (x) (tag (project x))))
+  'done)
+
+(define (install-complex-package)
+  (define (tag x) (attach-tag 'complex x))
+  (define (project x) (real-part x))
+  (put 'project '(complex) (lambda (x) (tag (project x))))
+  'done)
+
+(define (drop x)
+  (cond ((= (type-tag x) 'scheme-number) (contents x))
+        ((equ? (raise (project x)) x) (drop (project x)))
+        (else x)))
+
+(define (raise element)
+  (let ((type (type-tags element)))
+    (cond ((= type 'scheme-number) ((get-coercion 'scheme-number 'rational) element))
+          ((= type 'rational) ((get-coercion 'rational 'real) element))
+          ((= type 'real) ((get-coercion 'real 'complex) element))
+          (else (error "raise: unknown type -- " element)))))
+
+(define (raise-to type element)
+  (if (= (type-tags element) type)
+      element
+      (raise element)))
+
+(define (tower-position element)
+  (let ((type (type-tags element)))
+    (cond ((= type 'scheme-number) 1)
+          ((= type 'rational) 2)
+          ((= type 'real) 3)
+          ((= type 'complex) 4)
+          (else (error "tower-position: unknown type -- " element)))))
+
+(define (apply-generic op . args)
+  (let ((type-tags (map type-tags args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (apply proc (map contents args))
+          (if (= (length args) 2)
+            (let ((item1 (drop (car args)))
+              ((item2 (drop (cadr args))))
+                  (if (= (type-tags item1) (type-tags item2)) 
+                    (apply-generic op item1 item2)
+                    (error "No method for these types -- APPLY-GENERIC" op type-tags))))))))
