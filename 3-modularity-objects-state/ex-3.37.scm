@@ -63,14 +63,6 @@
                          request))))
     me))
 
-; Test Connector
-(define a (make-connector))
-(has-value? a)
-(set-value! a 10 'user)
-(get-value a)
-(forget-value! a 'user)
-(has-value? a)
-
 ; Adder
 (define (adder a1 a2 sum)
   (define (process-new-value)
@@ -105,18 +97,6 @@
   (connect a2 me)
   (connect sum me)
   me)
-
-; Test Adder
-(define a (make-connector))
-(define b (make-connector))
-(define c (make-connector))
-(adder a b c)
-(set-value! a 3 'user)
-(get-value c)
-(set-value! b 4 'user)
-(get-value c)
-(forget-value! a 'user)
-(has-value? c)
 
 ; Multiplier
 (define (multiplier m1 m2 product)
@@ -156,20 +136,6 @@
   (connect product me)
   me)
 
-; Test Multiplier
-(define a (make-connector))
-(define b (make-connector))
-(define c (make-connector))
-(multiplier a b c)
-(set-value! a 3 'user)
-(has-value? c)
-(set-value! b 4 'user)
-(get-value c)
-(forget-value! a 'user)
-(has-value? c)
-(set-value! c 8 'user)
-(get-value a)
-
 ; Constant
 (define (constant value connector)
   (define (me request)
@@ -177,32 +143,6 @@
   (connect connector me)
   (set-value! connector value me)
   me)
-
-; Test Constant
-(define a (make-connector))
-(constant 5 a)
-(get-value a)
-
-; Averager
-(define (averager a b c)
-  (let ((d (make-connector))
-        (e (make-connector)))
-    (adder a b d)
-    (constant 0.5 e)
-    (multiplier d e c)))
-
-; Test Averager
-(define a (make-connector))
-(define b (make-connector))
-(define c (make-connector))
-(averager a b c)
-(set-value! a 10 'user)
-(set-value! b 20 'user)
-(get-value c)
-(forget-value! a 'user)
-(has-value? c)
-(set-value! c 30 'user)
-(get-value a)
 
 ; C+
 (define (c+ x y)
@@ -231,3 +171,42 @@
 (set-value! a 10 'user)
 (set-value! b 20 'user)
 (get-value c)
+
+; c/
+(define (c/ x y)
+  (let ((z (make-connector)))
+    (multiplier y z x)
+    z))
+
+; Test c/
+(define a (make-connector))
+(define b (make-connector))
+(define c (c/ a b))
+(set-value! a 10 'user)
+(set-value! b 20 'user)
+(get-value c)
+
+; cv
+(define (cv v)
+  (let ((c (make-connector)))
+    (constant v c)
+    c))
+
+; Test cv
+(define a (cv 10))
+(get-value a)
+
+; Celsius to Fahrenheit
+(define (celsisus-farenheit-converter x)
+  (c+ (c* (c/ (cv 9) (cv 5))
+          x)
+      (cv 32)))
+
+; Test Celsius to Fahrenheit
+(define a (make-connector))
+(define b (celsisus-farenheit-converter a))
+(set-value! a 25 'user)
+(get-value b)
+(forget-value! a 'user)
+(set-value! b 212 'user)
+(get-value a)
