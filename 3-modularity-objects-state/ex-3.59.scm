@@ -28,4 +28,9 @@
 
 
 ; Part b
+(define exp-series (cons-stream 1 (integrate-series exp-series)))
 
+; Test
+(stream-ref exp-series 0)
+(stream-ref exp-series 1)
+(stream-ref exp-series 2)
